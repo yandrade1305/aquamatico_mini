@@ -119,6 +119,11 @@ void blink_last_two_rows() {
 }
 
 int main() {
+    bool botao_a_pressionado = false;
+    bool botao_b_pressionado = false;
+    int passo_motor = 0;
+    bool bomba_ligada = false;
+
     stdio_init_all();
 
     i2c_init(i2c1, ssd1306_i2c_clock * 1000);
@@ -181,6 +186,9 @@ int main() {
         sleep_ms(2000);
     
         if (!gpio_get(BUTTON_A_PIN)) {
+            botao_a_pressionado = true;
+            passo_motor = 1;
+
             uint8_t ssd[ssd1306_buffer_length];
             memset(ssd, 0, ssd1306_buffer_length);
             render_on_display(ssd, &frame_area);
@@ -195,12 +203,18 @@ int main() {
                 y += 8; 
             }
             render_on_display(ssd, &frame_area);
-
+            
             drop_green_dot();
             sleep_ms(500);
+
+            botao_a_pressionado = false;
+            passo_motor = 0;
         }
     
         if (!gpio_get(BUTTON_B_PIN)) {
+
+            botao_b_pressionado = true;
+            bomba_ligada = true;
                         uint8_t ssd[ssd1306_buffer_length];
                         memset(ssd, 0, ssd1306_buffer_length);
                         render_on_display(ssd, &frame_area);
@@ -219,6 +233,9 @@ int main() {
 
             blink_last_two_rows();
             sleep_ms(500);
+
+            botao_b_pressionado = false;
+            bomba_ligada = false;
         }
     
         static uint32_t last_update_time = 0;
